@@ -40,6 +40,16 @@ class DBClient {
     const result = await this.users.insertOne(data);
     return result.insertedId;
   }
+
+  async findFile(query) {
+    const file = await this.files.findOne(query);
+    return file;
+  }
+
+  async addFile(data) {
+    const result = await this.files.insertOne(data);
+    return result.insertedId;
+  }
 }
 
 const dbClient = new DBClient();

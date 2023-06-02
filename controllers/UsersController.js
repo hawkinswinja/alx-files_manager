@@ -1,5 +1,7 @@
 import sha1 from 'sha1';
+import { ObjectID } from 'mongodb';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 export default class UsersController {
   static async postNew(req, res) {
@@ -15,6 +17,16 @@ export default class UsersController {
       const data = { email, password: sha1(pw) };
       const id = await dbClient.addUser(data);
       res.status(201).json({ id, email });
+    }
+  }
+
+  static async getMe(req, res) {
+    const id = await redisClient.get(req.headers['x-token']);
+    if (id) {
+      const user = await dbClient.findUser({ _id: new ObjectID(id) });
+      res.json({ id, email: user.email });
+    } else {
+      res.status(401).json({ error: 'Unauthorized' });
     }
   }
 }
